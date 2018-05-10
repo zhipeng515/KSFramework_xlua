@@ -51,7 +51,7 @@ namespace XLua.CSObjectWrap
 			%><%=CsFullTypeName(parameter.ParameterType)%> <%=parameter.Name%><% 
 		end) %>)
 		{
-#if THREAD_SAFT || HOTFIX_ENABLE
+#if THREAD_SAFE || HOTFIX_ENABLE
             lock (luaEnv.luaEnvLock)
             {
 #endif
@@ -96,7 +96,7 @@ namespace XLua.CSObjectWrap
 				<%if has_return then %><%=GetCasterStatement(method.ReturnType, "err_func + 1", "__gen_ret", true)%>;<% end%>
 				LuaAPI.lua_settop(L, err_func - 1);
 				<%if has_return then %>return  __gen_ret;<% end%>
-#if THREAD_SAFT || HOTFIX_ENABLE
+#if THREAD_SAFE || HOTFIX_ENABLE
             }
 #endif
 		}
@@ -104,13 +104,22 @@ namespace XLua.CSObjectWrap
 
         <%
         ForEachCsList(propertys, function(property)
+		local is_sub_interface_prop = property.DeclaringType ~= type
+		local parent_has_same_name = false
+		if is_sub_interface_prop then
+			ForEachCsList(propertys, function(p) 
+				if p.DeclaringType ~= type and p.Name == property.Name then
+				    parent_has_same_name = true
+				end
+			end)
+		end
         %>
-        public <%=CsFullTypeName(property.PropertyType)%> <%=property.Name%> 
+        <%if not parent_has_same_name then%>public <%end%><%=CsFullTypeName(property.PropertyType)%> <%if parent_has_same_name then%><%=CsFullTypeName(property.DeclaringType)%>.<%end%><%=property.Name%> 
         {
             <%if property.CanRead then%>
             get 
             {
-#if THREAD_SAFT || HOTFIX_ENABLE
+#if THREAD_SAFE || HOTFIX_ENABLE
                 lock (luaEnv.luaEnvLock)
                 {
 #endif
@@ -126,7 +135,7 @@ namespace XLua.CSObjectWrap
 					<%=GetCasterStatement(property.PropertyType, "-1", "__gen_ret", true)%>;
 					LuaAPI.lua_pop(L, 2);
 					return __gen_ret;
-#if THREAD_SAFT || HOTFIX_ENABLE
+#if THREAD_SAFE || HOTFIX_ENABLE
                 }
 #endif
             }
@@ -134,7 +143,7 @@ namespace XLua.CSObjectWrap
             <%if property.CanWrite then%>
             set
             {
-#if THREAD_SAFT || HOTFIX_ENABLE
+#if THREAD_SAFE || HOTFIX_ENABLE
                 lock (luaEnv.luaEnvLock)
                 {
 #endif
@@ -149,7 +158,7 @@ namespace XLua.CSObjectWrap
 						luaEnv.ThrowExceptionFromError(oldTop);
 					}
 					LuaAPI.lua_pop(L, 1);
-#if THREAD_SAFT || HOTFIX_ENABLE
+#if THREAD_SAFE || HOTFIX_ENABLE
                 }
 #endif
             }

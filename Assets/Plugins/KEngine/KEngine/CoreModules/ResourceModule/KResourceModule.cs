@@ -432,6 +432,7 @@ namespace KEngine
                 //UnityEditor.EditorUserBuildSettings.activeBuildTarget;
                 switch (buildTarget)
                 {
+					case "StandaloneOSX":
                     case "StandaloneOSXIntel":
                     case "StandaloneOSXIntel64":
                     case "StandaloneOSXUniversal":
@@ -491,11 +492,13 @@ namespace KEngine
         {
             string fileProtocol = "file://";
             if (Application.platform == RuntimePlatform.WindowsEditor ||
-                Application.platform == RuntimePlatform.WindowsPlayer
+                Application.platform == RuntimePlatform.WindowsPlayer ||
+				Application.platform == RuntimePlatform.OSXEditor ||
+				Application.platform == RuntimePlatform.OSXPlayer)
 #if !UNITY_5_4_OR_NEWER
                 || Application.platform == RuntimePlatform.WindowsWebPlayer
 #endif
-)
+
                 fileProtocol = "file:///";
 
             return fileProtocol;
