@@ -19,6 +19,6 @@ UnityEditorVersion  5.3.7p4
 
 UnityEditorVersion  2017.1.1p2
 
-
+UnityEditorVersion  2017.3.1p4
 
 在使用过程中遇到或者发现错误，欢迎pull 和issues，共同维护KSFramework。
